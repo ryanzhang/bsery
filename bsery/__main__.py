@@ -1,13 +1,12 @@
 # -*- coding: UTF-8 -*-
-import argparse 
-import logging  
+import argparse
+from datetime import date, datetime  # pragma: no cover
 
-from . import BaseClass, base_function  # pragma: no cover
+from kupy.logger import logger
+from bsery.big_small_eft_rotate import BigSmallEtfRotateStrategy
 
-# 初始化日志
-logging.basicConfig(
-    level=logging.INFO, format=" %(asctime)s - %(levelname)s- %(message)s"
-)
+# from . import BaseClass, base_function  # pragma: no cover
+
 
 def main() -> None:  # pragma: no cover
     """
@@ -26,25 +25,17 @@ def main() -> None:  # pragma: no cover
         * Run an application (Flask, FastAPI, Django, etc.)
     """
     parser = argparse.ArgumentParser(
-        description="bsery.",
+        description="bsery big_small_etf_rotate strategy",
         epilog="Enjoy the bsery functionality!",
     )
-    # This is required positional argument
-    parser.add_argument(
-        "name",
-        type=str,
-        help="The username",
-        default="ryanzhang",
-    )
-    # This is optional named argument
-    parser.add_argument(
-        "-m",
-        "--message",
-        type=str,
-        help="The Message",
-        default="Hello",
-        required=False,
-    )
+    # # This is required positional argument
+    # parser.add_argument(
+    #     "name",
+    #     type=str,
+    #     help="The username",
+    #     default="ryanzhang",
+    # )
+
     parser.add_argument(
         "-v",
         "--verbose",
@@ -52,16 +43,21 @@ def main() -> None:  # pragma: no cover
         help="Optionally adds verbosity",
     )
     args = parser.parse_args()
-    print(f"{args.message} {args.name}!")
+    # print(f"{args.message} {args.name}!")
     if args.verbose:
         print("Verbose mode is on.")
-        logging.info("Runing the main function, Allright!")
+        # logging.basicConfig(
+        #     level=logging.INFO, format=" %(asctime)s - %(levelname)s- %(message)s"
+        # )
 
-    print("Executing main function")
-    base = BaseClass()
-    print(base.base_method())
-    print(base_function())
-    print("End of main function")
+    logger.info("Executing main function")
+    bsery = BigSmallEtfRotateStrategy(1)
+    # today=datetime.today()
+    today=date(2022,1,28)
+    df = bsery.get_strategy_by_date(today)
+    row_count = bsery.write_df_to_db(df)
+    logger.info(f"写入了{row_count}条{__file__}策略数据")
+    logger.info("End of main function")
 
 
 if __name__ == "__main__":  # pragma: no cover
