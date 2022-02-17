@@ -155,9 +155,10 @@ systest2:
 	fi
 
 
-.PHONY: deploy-dev tag-dev deploy-prod
-tag-dev:
+.PHONY: deploy-dev tagstage deploy-prod
+tagstage:
 	@oc apply -f .openshift/dev/cm.yaml
+	@oc apply -f .openshift/dev/cronjob-bsery-deployment.yaml
 	@git checkout bsery/VERSION
 	@sleep 1
 	@PRE_TAG=$(shell cat bsery/VERSION);\
@@ -167,10 +168,11 @@ tag-dev:
 	oc set image cronjob/bsery bsery=image-registry.openshift-image-registry.svc:5000/classic-dev/bsery:$${TAG} -n classic-dev;\
 	echo "Release $${TAG} has been deployed successfullyto stage environment!"
 
-deploystage: test image systest2 tag-dev
+deploystage: test image systest2 tagstage
 
 deployprod: release
 	@oc apply -f .openshift/prod/cm.yaml
+	@oc apply -f .openshift/prod/cronjob-bsery-deployment.yaml
 	@TAG=$(shell cat bsery/VERSION);\
 	oc tag classic-dev/bsery:$${TAG} quant-invest/bsery:$${TAG};\
 	oc set image cronjob/bsery bsery=image-registry.openshift-image-registry.svc:5000/quant-invest/bsery:$${TAG} -n quant-invest;\
