@@ -125,12 +125,16 @@ sdist:
 
 # Make container image by podman
 #You would need podman for this
-.PHONY: image systest looptest
+.PHONY: image systest1 systest2 looptest
 image:
 	https_prox=http://192.168.2.15:3128 podman build -f Containerfile . -t default-route-openshift-image-registry.apps.ocp1.galaxy.io/classic-dev/bsery:latest
 	podman push default-route-openshift-image-registry.apps.ocp1.galaxy.io/classic-dev/bsery:latest --tls-verify=false
 
-systest:
+systest1: virtualenv
+	@soruce .venv/bin/activate
+	@python3 -m bsery
+
+systest2:
 	rm -rf .systestpass
 	@oc apply -f .openshift/dev/cm.yaml
 	-oc delete job systest-bsery -n classic-dev

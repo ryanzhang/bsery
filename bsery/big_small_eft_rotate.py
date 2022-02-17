@@ -345,7 +345,7 @@ class BigSmallEtfRotateStrategy:
             pre.balance = pre.total_amount
             pre.net = 1
         elif df_db.shape[0] > 0:
-            df = df[df.index >= df_db.iloc[-1]["trade_date"]]
+            df = df[df.index > df_db.iloc[-1]["trade_date"]]
             pre.vol = df_db.iloc[-1]["vol"]
             pre.amount = df_db.iloc[-1]["amount"]
             pre.total_amount = df_db.iloc[-1]["total_amount"]
