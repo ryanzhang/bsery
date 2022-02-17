@@ -400,7 +400,7 @@ class BigSmallEtfRotateStrategy:
                 bser.next_trade_cd = row[
                     "next_trade_cd"
                 ]  # 交易类型 0 不交易 1 买入,2卖出,3换仓
-                bser.vol = row["vol"]  # 交易多少手
+                bser.vol = row["vol"]  # 交易多少股
                 bser.trade_fee = row["trade_fee"]  # 扣除手续费后的涨幅
                 bser.amount = row["amount"]  # 股票市值
                 bser.total_amount = row["total_amount"]  # 资产市值

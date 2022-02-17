@@ -3,7 +3,7 @@ kind: Job
 metadata:
   annotations:
     image.openshift.io/triggers: "null"
-  name: debug-syd
+  name: debug-bsery
   namespace: classic-dev
 spec:
   parallelism: 1    
@@ -11,12 +11,12 @@ spec:
   activeDeadlineSeconds: 1800
   template:         
     metadata:
-      name: syd
+      name: bsery
     spec:
       containers:
-        - name: syd
-          image: image-registry.openshift-image-registry.svc:5000/classic-dev/syd:latest
-          command: ["syd"]
+        - name: bsery
+          image: image-registry.openshift-image-registry.svc:5000/classic-dev/bsery:latest
+          command: ["bsery"]
           env:
           - name: TZ
             value: Asia/Shanghai
@@ -24,19 +24,14 @@ spec:
             limits:
               memory: 1Gi
           volumeMounts:
-            - mountPath: /app/syd/data
-              name: syd-data-volume
-            - mountPath: /app/syd/resources/app-config.properties
+            - mountPath: /app/resources/app-config.properties
               subPath: app-config.properties
               readOnly: false
-              name: syd-properties-volume
+              name: bsery-properties-volume
       volumes:
-        - persistentVolumeClaim:
-            claimName: syd-data
-          name: syd-data-volume
         - configMap:
-            name: syd-main-config
+            name: bsery-main-config
             defaultMode: 272
             optional: false
-          name: syd-properties-volume
+          name: bsery-properties-volume
       restartPolicy: Never 

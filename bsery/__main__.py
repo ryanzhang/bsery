@@ -53,8 +53,7 @@ def main() -> None:  # pragma: no cover
 
     logger.info("Executing main function")
     bsery = BigSmallEtfRotateStrategy(1)
-    # today=date.today()
-    today = date(2022, 1, 28)
+    today=date.today()
     df = bsery.get_strategy_by_date(today)
     row_count = bsery.write_df_to_db(df)
     logger.info(f"写入了{row_count}条{__file__}策略数据")

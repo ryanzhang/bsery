@@ -163,9 +163,10 @@ tag-dev:
 	oc set image cronjob/bsery bsery=image-registry.openshift-image-registry.svc:5000/classic-dev/bsery:$${TAG} -n classic-dev;\
 	echo "Release $${TAG} has been deployed successfullyto stage environment!"
 
-stagedeploy: test image systest tag-dev release
+deploystage: test image systest tag-dev release
 
-proddeploy:
+deployprod:
+	@oc apply -f .openshift/prod/cm.yaml
 	@TAG=$(shell cat bsery/VERSION);\
 	oc tag classic-dev/bsery:$${TAG} quant-invest/bsery:$${TAG};\
 	oc set image cronjob/bsery bsery=image-registry.openshift-image-registry.svc:5000/quant-invest/bsery:$${TAG} -n quant-invest;\

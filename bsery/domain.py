@@ -43,7 +43,7 @@ class BigSmallEtfRotate(Base):
     small_net = Column(Float)  # 净值因子
     strategy_net = Column(Float)  # 净值因子
     trade_fee = Column(Float)  # 扣除手续费后的涨幅
-    vol = Column(Float)  # 交易多少手
+    vol = Column(Float)  # 交易多少股
     amount = Column(Float)  # 资产市值
     total_amount = Column(Float)  # 资产市值
     strategy_chg_pct_real = Column(Float)  # 扣除手续费后的涨幅

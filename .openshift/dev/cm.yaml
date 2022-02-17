@@ -9,8 +9,12 @@ data:
     postgres_database=market
 
     log_level=DEBUG
-    log_output_path=/app/bsery/data/log/bsery-app.log
-    data_folder=/app/bsery/data/cache/
+    log_output_path=/app/data/log/bsery-app.log
+    data_folder=/app/data/cache/
+    trade_rate=2.5
+    ticker_x=510300
+    ticker_y=159915
+    strategy_status_cd=R    
 kind: ConfigMap
 metadata:
   name: bsery-main-config

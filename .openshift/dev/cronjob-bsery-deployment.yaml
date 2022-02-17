@@ -8,7 +8,7 @@ metadata:
   name: bsery
   namespace: classic-dev
 spec:
-  schedule: "0 10 * * 1-5"
+  schedule: "20 10 * * 1-5"
   concurrencyPolicy: "Forbid"
   startingDeadlineSeconds: 600
   suspend: false
@@ -32,16 +32,11 @@ spec:
                 limits:
                   memory: 1Gi
               volumeMounts:
-                - mountPath: /app/bsery/data
-                  name: bsery-data-volume
-                - mountPath: /app/bsery/resources/app-config.properties
+                - mountPath: /app/resources/app-config.properties
                   subPath: app-config.properties
                   readOnly: false
                   name: bsery-properties-volume
           volumes:
-            - persistentVolumeClaim:
-                claimName: bsery-data
-              name: bsery-data-volume
             - configMap:
                 name: bsery-main-config
                 defaultMode: 272
