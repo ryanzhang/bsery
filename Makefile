@@ -26,20 +26,20 @@ install:          ## Install the project in dev mode.
 
 .PHONY: fmt
 fmt:              ## Format code using black & isort.
-	$(ENV_PREFIX)isort project_name/
-	$(ENV_PREFIX)black -l 79 project_name/
+	$(ENV_PREFIX)isort bsery/
+	$(ENV_PREFIX)black -l 79 bsery/
 	$(ENV_PREFIX)black -l 79 tests/
 
 .PHONY: lint
 lint:             ## Run pep8, black, mypy linters.
-	$(ENV_PREFIX)flake8 project_name/
-	$(ENV_PREFIX)black -l 79 --check project_name/
+	$(ENV_PREFIX)flake8 bsery/
+	$(ENV_PREFIX)black -l 79 --check bsery/
 	$(ENV_PREFIX)black -l 79 --check tests/
-	$(ENV_PREFIX)mypy --ignore-missing-imports project_name/
+	$(ENV_PREFIX)mypy --ignore-missing-imports bsery/
 
 .PHONY: test
 test: lint        ## Run tests and generate coverage report.
-	$(ENV_PREFIX)pytest -v --cov-config .coveragerc --cov=project_name -l --tb=short --maxfail=1 tests/
+	$(ENV_PREFIX)pytest -v --cov-config .coveragerc --cov=bsery -l --tb=short --maxfail=1 tests/
 	$(ENV_PREFIX)coverage xml
 	$(ENV_PREFIX)coverage html
 
@@ -77,9 +77,9 @@ virtualenv:       ## Create a virtual environment.
 .PHONY: release
 release:          ## Create a new tag for release.	
 	@$(ENV_PREFIX)gitchangelog > HISTORY.md
-	@TAG=v$(shell cat project_name/VERSION);\
+	@TAG=v$(shell cat bsery/VERSION);\
 	sed -i "s=unreleased=$${TAG}=g" HISTORY.md||True;\
-	git add project_name/VERSION HISTORY.md;\
+	git add bsery/VERSION HISTORY.md;\
 	git commit -m "release: version $${TAG} 🚀";\
 	echo "creating git tag : $${TAG}";\
 	git tag $${TAG}; 
@@ -100,7 +100,7 @@ switch-to-poetry: ## Switch to poetry package manager.
 	@poetry init --no-interaction --name=a_flask_test --author=rochacbruno
 	@echo "" >> pyproject.toml
 	@echo "[tool.poetry.scripts]" >> pyproject.toml
-	@echo "project_name = 'project_name.__main__:main'" >> pyproject.toml
+	@echo "bsery = 'bsery.__main__:main'" >> pyproject.toml
 	@cat requirements.txt | while read in; do poetry add --no-interaction "$${in}"; done
 	@cat requirements-test.txt | while read in; do poetry add --no-interaction "$${in}" --dev; done
 	@poetry install --no-interaction
@@ -108,7 +108,7 @@ switch-to-poetry: ## Switch to poetry package manager.
 	@mv requirements* .github/backup
 	@mv setup.py .github/backup
 	@echo "You have switched to https://python-poetry.org/ package manager."
-	@echo "Please run 'poetry shell' or 'poetry run project_name'"
+	@echo "Please run 'poetry shell' or 'poetry run bsery'"
 
 .PHONY: init
 init:             ## Initialize the project based on an application template.
@@ -127,19 +127,19 @@ sdist:
 #You would need podman for this
 .PHONY: image systest looptest
 image:
-	https_prox=http://192.168.2.15:3128 podman build -f Containerfile . -t default-route-openshift-image-registry.apps.ocp1.galaxy.io/classic-dev/project_name:latest
-	podman push default-route-openshift-image-registry.apps.ocp1.galaxy.io/classic-dev/project_name:latest --tls-verify=false
+	https_prox=http://192.168.2.15:3128 podman build -f Containerfile . -t default-route-openshift-image-registry.apps.ocp1.galaxy.io/classic-dev/bsery:latest
+	podman push default-route-openshift-image-registry.apps.ocp1.galaxy.io/classic-dev/bsery:latest --tls-verify=false
 
 systest:
 	rm -rf .systestpass
 	@oc apply -f .openshift/dev/cm.yaml
-	-oc delete job systest-project_name -n classic-dev
-	@oc apply -f .openshift/dev/systest-job-project_name-deployment.yaml
+	-oc delete job systest-bsery -n classic-dev
+	@oc apply -f .openshift/dev/systest-job-bsery-deployment.yaml
 	# Wait 5 seconds
 	@sleep  5
 	@for i in 1 2 3 4 ; do \
 		sleep 3;\
-		rc=`oc get job systest-project_name --template '{{.status.succeeded}}'`;\
+		rc=`oc get job systest-bsery --template '{{.status.succeeded}}'`;\
 		echo -e ".$${rc}" ;\
 		test "$${rc}" == 1 && echo "pass" && touch .systestpass; \
 		if [ -a .systestpass ];then \
@@ -154,21 +154,21 @@ systest:
 .PHONY: deploy-dev tag-dev deploy-prod
 tag-dev:
 	@oc apply -f .openshift/dev/cm.yaml
-	@git checkout project_name/VERSION
+	@git checkout bsery/VERSION
 	@sleep 1
-	@PRE_TAG=$(shell cat project_name/VERSION);\
+	@PRE_TAG=$(shell cat bsery/VERSION);\
 	read -p "Version? (provide the next x.y.z version,Previous tag, $${PRE_TAG}) : " TAG ;\
-	echo "$${TAG}" > project_name/VERSION;\
-	oc tag classic-dev/project_name:latest classic-dev/project_name:$${TAG};\
-	oc set image cronjob/project_name project_name=image-registry.openshift-image-registry.svc:5000/classic-dev/project_name:$${TAG} -n classic-dev;\
+	echo "$${TAG}" > bsery/VERSION;\
+	oc tag classic-dev/bsery:latest classic-dev/bsery:$${TAG};\
+	oc set image cronjob/bsery bsery=image-registry.openshift-image-registry.svc:5000/classic-dev/bsery:$${TAG} -n classic-dev;\
 	echo "Release $${TAG} has been deployed successfullyto stage environment!"
 
 stagedeploy: test image systest tag-dev release
 
 proddeploy:
-	@TAG=$(shell cat project_name/VERSION);\
-	oc tag classic-dev/project_name:$${TAG} quant-invest/project_name:$${TAG};\
-	oc set image cronjob/project_name project_name=image-registry.openshift-image-registry.svc:5000/quant-invest/project_name:$${TAG} -n quant-invest;\
+	@TAG=$(shell cat bsery/VERSION);\
+	oc tag classic-dev/bsery:$${TAG} quant-invest/bsery:$${TAG};\
+	oc set image cronjob/bsery bsery=image-registry.openshift-image-registry.svc:5000/quant-invest/bsery:$${TAG} -n quant-invest;\
 	echo "Release $${TAG} has been deployed successfullyto production🚀!"
 	
 

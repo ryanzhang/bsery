@@ -1,0 +1,50 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  annotations:
+    image.openshift.io/triggers: "null"
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"batch/v1beta1","kind":"CronJob","metadata":{"annotations":{},"name":"bsery","namespace":"quant-invest"},"spec":{"concurrencyPolicy":"Forbid","failedJobsHistoryLimit":1,"jobTemplate":{"spec":{"template":{"metadata":{"labels":{"parent":"cronjob"}},"spec":{"containers":[{"command":["bsery"],"env":[{"name":"TZ","value":"Asia/Shanghai"}],"image":"bsery:latest","name":"bsery","resources":{"limits":{"memory":"1Gi"}},"volumeMounts":[{"mountPath":"/app/bsery/data","name":"bsery-data-volume"},{"mountPath":"/app/bsery/resources/app-config.properties","name":"bsery-properties-volume","readOnly":false,"subPath":"app-config.properties"}]}],"restartPolicy":"Never","volumes":[{"name":"bsery-data-volume","persistentVolumeClaim":{"claimName":"bsery-data"}},{"configMap":{"defaultMode":272,"name":"bsery-main-config","optional":false},"name":"bsery-properties-volume"}]}}}},"schedule":"* * * * *","startingDeadlineSeconds":600,"successfulJobsHistoryLimit":3,"suspend":false}}
+  name: bsery
+  namespace: quant-invest
+spec:
+  schedule: "15 10 * * 1-5"
+  concurrencyPolicy: "Forbid"
+  startingDeadlineSeconds: 600
+  suspend: false
+  successfulJobsHistoryLimit: 9
+  failedJobsHistoryLimit: 5
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            parent: "cronjob"
+        spec:
+          containers:
+            - name: bsery
+              image: image-registry.openshift-image-registry.svc:5000/quant-invest/bsery:1.0.1-2
+              command: ["bsery"]
+              env:
+              - name: TZ
+                value: Asia/Shanghai
+              resources:
+                limits:
+                  memory: 1Gi
+              volumeMounts:
+                - mountPath: /app/bsery/data
+                  name: bsery-data-volume
+                - mountPath: /app/bsery/resources/app-config.properties
+                  subPath: app-config.properties
+                  readOnly: false
+                  name: bsery-properties-volume
+          volumes:
+            - persistentVolumeClaim:
+                claimName: bsery-data
+              name: bsery-data-volume
+            - configMap:
+                name: bsery-main-config
+                defaultMode: 272
+                optional: false
+              name: bsery-properties-volume
+          restartPolicy: Never

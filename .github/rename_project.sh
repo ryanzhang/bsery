@@ -16,10 +16,10 @@ echo "Description: $description";
 
 echo "Renaming project..."
 
-original_author="author_name"
-original_name="project_name"
-original_urlname="project_urlname"
-original_description="project_description"
+original_author="ryanzhang"
+original_name="bsery"
+original_urlname="bsery"
+original_description="Awesome bsery created by ryanzhang"
 # for filename in $(find . -name "*.*") 
 for filename in $(git ls-files) 
 do
@@ -30,8 +30,8 @@ do
     echo "Renamed $filename"
 done
 
-mv project_name $name
-find . -name "*project_name*" |  sed  's/\(\(.*\)project_name\(.*\)\)/\1 \2bsery\3/g' | while read name1 name2; do mv $name1 $name2; done
+mv bsery $name
+find . -name "*bsery*" |  sed  's/\(\(.*\)bsery\(.*\)\)/\1 \2bsery\3/g' | while read name1 name2; do mv $name1 $name2; done
 
 # This command runs only once on GHA!
 rm -rf .github/template.yml

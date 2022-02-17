@@ -3,7 +3,7 @@ kind: Job
 metadata:
   annotations:
     image.openshift.io/triggers: "null"
-  name: systest-project_name
+  name: systest-bsery
   namespace: classic-dev
 spec:
   parallelism: 1    
@@ -12,12 +12,12 @@ spec:
   activeDeadlineSeconds: 1800
   template:         
     metadata:
-      name: project_name
+      name: bsery
     spec:
       containers:
-        - name: project_name
-          image: image-registry.openshift-image-registry.svc:5000/classic-dev/project_name:latest
-          command: ["project_name"]
+        - name: bsery
+          image: image-registry.openshift-image-registry.svc:5000/classic-dev/bsery:latest
+          command: ["bsery"]
           env:
           - name: TZ
             value: Asia/Shanghai
@@ -25,19 +25,19 @@ spec:
             limits:
               memory: 1Gi
           volumeMounts:
-            - mountPath: /app/project_name/data
-              name: project_name-data-volume
-            - mountPath: /app/project_name/resources/app-config.properties
+            - mountPath: /app/bsery/data
+              name: bsery-data-volume
+            - mountPath: /app/bsery/resources/app-config.properties
               subPath: app-config.properties
               readOnly: false
-              name: project_name-properties-volume
+              name: bsery-properties-volume
       volumes:
         - persistentVolumeClaim:
-            claimName: project_name-data
-          name: project_name-data-volume
+            claimName: bsery-data
+          name: bsery-data-volume
         - configMap:
-            name: project_name-main-config
+            name: bsery-main-config
             defaultMode: 272
             optional: false
-          name: project_name-properties-volume
+          name: bsery-properties-volume
       restartPolicy: Never 
