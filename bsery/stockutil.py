@@ -43,7 +43,7 @@ class StockUtil:
         """
         # 如果给定日期不是交易日，就需要将offset 增1
 
-        df = self.trade_calendar[self.trade_calendar["is_open"] is True]
+        df = self.trade_calendar[self.trade_calendar["is_open"] == True]
         if offset >= 0:
             df = df.loc[
                 df["calendar_date"] <= trade_date, "calendar_date"
