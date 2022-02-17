@@ -1,4 +1,3 @@
-
 from datetime import date, datetime, timedelta
 from importlib import invalidate_caches
 import math
@@ -24,7 +23,7 @@ class TestBigSmallEtfRotateStrategy:
     @pytest.fixture(scope="class")
     def db(self):
         return DBAdaptor(is_use_cache=True)
-    
+
     @pytest.fixture(scope="class")
     def bsery(self):
         return BigSmallEtfRotateStrategy(1)
@@ -36,29 +35,30 @@ class TestBigSmallEtfRotateStrategy:
         db.execute_any_sql("delete from invest.big_small_etf_rotate")
         yield
         logger.info("TestCase Level Tear Down is triggered!")
-        
-    def test_strategy_construct_ok(self, db:DBAdaptor):
-        bsery = BigSmallEtfRotateStrategy(1) 
+
+    def test_strategy_construct_ok(self, db: DBAdaptor):
+        bsery = BigSmallEtfRotateStrategy(1)
         assert bsery is not None
         assert bsery.account.account_id == 1
         assert bsery.ticker_x != ""
         assert bsery.ticker_y != ""
-        assert bsery.trade_rate > 1/10000
+        assert bsery.trade_rate > 1 / 10000
         # assert bsery.initial_amount >= 10000
         assert bsery.momentum_days > 1
         assert bsery.ticker_x_name != ""
         assert bsery.ticker_y_name != ""
         logger.debug(bsery)
 
-    
-    def test_get_strategy_by_latest_date(self, bsery:BigSmallEtfRotateStrategy):
+    def test_get_strategy_by_latest_date(
+        self, bsery: BigSmallEtfRotateStrategy
+    ):
         """指定日期2022/1/28 (收盘后运行)，算出轮动风格以及第二日的买卖策略
 
         Args:
             bsery (BigSmallEtfRotateStrategy): _description_
-        """        
-        start_date=date(2022,1,28)
-        end_date=start_date
+        """
+        start_date = date(2022, 1, 28)
+        end_date = start_date
         expect = bsery.get_strategy_by_date(start_date, end_date)
         assert expect is not None
         assert expect.shape[0] == 1
@@ -71,14 +71,16 @@ class TestBigSmallEtfRotateStrategy:
         expect.to_csv("/tmp/bsery_can_run.csv")
         logger.info(f"{expect}")
 
-    def test_get_strategy_by_nonlatestdate(self, bsery:BigSmallEtfRotateStrategy):
+    def test_get_strategy_by_nonlatestdate(
+        self, bsery: BigSmallEtfRotateStrategy
+    ):
         """指定日期2022/1/27 (收盘后运行)，算出轮动风格以及第二日的买卖策略
 
         Args:
             bsery (BigSmallEtfRotateStrategy): _description_
-        """        
-        start_date=date(2020,1,20)
-        end_date=date(2022,1,28)
+        """
+        start_date = date(2020, 1, 20)
+        end_date = date(2022, 1, 28)
         expect = bsery.get_strategy_by_date(start_date, end_date)
         expect.to_csv("/tmp/bsery_can_run.csv")
         assert expect is not None
@@ -91,9 +93,9 @@ class TestBigSmallEtfRotateStrategy:
         # assert expect["trade_cd"].iloc[0] == 0
         logger.info(f"{expect}")
 
-    def test_write_df_to_db_latest_row(self,  bsery:BigSmallEtfRotateStrategy):
-        start_date=date(2022,1,28)
-        end_date=date(2022,1,28)
+    def test_write_df_to_db_latest_row(self, bsery: BigSmallEtfRotateStrategy):
+        start_date = date(2022, 1, 28)
+        end_date = date(2022, 1, 28)
         expect = bsery.get_strategy_by_date(start_date, end_date)
         bsery.write_df_to_db(expect)
         db = DBAdaptor()
@@ -112,53 +114,56 @@ class TestBigSmallEtfRotateStrategy:
         assert actual["amount"].iloc[0] == 0.0
         assert actual["vol"].iloc[0] == 0
 
-        
-    def test_calc_df_with_account_data(self, bsery:BigSmallEtfRotateStrategy):
-        start_date=date(2020,1,20)
-        end_date=date(2022,1,28)
+    def test_calc_df_with_account_data(self, bsery: BigSmallEtfRotateStrategy):
+        start_date = date(2020, 1, 20)
+        end_date = date(2022, 1, 28)
         df = bsery.get_strategy_by_date(start_date, end_date)
         # df.to_pickle("/tmp/test_calc_df_with_account.pkl")
         # df:pd.DataFrame = pd.read_pickle("/tmp/test_calc_df_with_account.pkl")
         df.reset_index(inplace=True)
 
-        initdata:AccountData = AccountData()
-        initdata.total_amount=100000
-        initdata.balance=100000
-        initdata.net=1
-    
+        initdata: AccountData = AccountData()
+        initdata.total_amount = 100000
+        initdata.balance = 100000
+        initdata.net = 1
+
         df = bsery.calc_df_with_account_data(initdata, df)
         # df.to_csv("/tmp/test_calc_df_with_account.csv")
 
-    #skip because it takes long to run
-    @skip    
-    def test_write_df_to_db_many_row(self,  bsery:BigSmallEtfRotateStrategy):
-        start_date=date(2020,1,20)
-        end_date=date(2022,1,28)
+    # skip because it takes long to run
+    @skip
+    def test_write_df_to_db_many_row(self, bsery: BigSmallEtfRotateStrategy):
+        start_date = date(2020, 1, 20)
+        end_date = date(2022, 1, 28)
         expect = bsery.get_strategy_by_date(start_date, end_date)
         bsery.write_df_to_db(expect)
         db = DBAdaptor()
-        actual = db.get_df_by_sql("select * from invest.big_small_etf_rotate order by id")
+        actual = db.get_df_by_sql(
+            "select * from invest.big_small_etf_rotate order by id"
+        )
         assert expect is not None
         assert actual is not None
 
-        assert actual.shape[0] >1
+        assert actual.shape[0] > 1
 
         assert actual["trade_date"].iloc[0] == start_date
         assert actual["pos"].iloc[0] == "empty"
         assert actual["pos"].iloc[1] == "small"
         # actual.to_csv("/tmp/db_export.csv")
-    
-    def test_run_two_time(self,bsery:BigSmallEtfRotateStrategy):
-        start_date=date(2022,1,24)
-        end_date = date(2022,1,26)
+
+    def test_run_two_time(self, bsery: BigSmallEtfRotateStrategy):
+        start_date = date(2022, 1, 24)
+        end_date = date(2022, 1, 26)
         expect1 = bsery.get_strategy_by_date(start_date, end_date)
         bsery.write_df_to_db(expect1)
-        start_date=date(2022,1,27)
-        end_date = date(2022,1,28)
+        start_date = date(2022, 1, 27)
+        end_date = date(2022, 1, 28)
         expect2 = bsery.get_strategy_by_date(start_date, end_date)
         bsery.write_df_to_db(expect2)
         db = DBAdaptor()
-        actual = db.get_df_by_sql("select * from invest.big_small_etf_rotate order by id")
+        actual = db.get_df_by_sql(
+            "select * from invest.big_small_etf_rotate order by id"
+        )
         assert expect1 is not None
         assert expect2 is not None
         assert actual is not None
@@ -166,7 +171,6 @@ class TestBigSmallEtfRotateStrategy:
         assert expect2.shape[0] == 2
 
         assert actual.shape[0] == 5
-
 
     # def test_stragegy_can_run_as_daemon_but_suspend(self, db:DBAdaptor):
     #     #假设30天前开始轮动
