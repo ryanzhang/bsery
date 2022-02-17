@@ -190,9 +190,8 @@ class TestBigSmallEtfRotateStrategy:
         assert actual.shape[0] == 5
         actual.to_csv("/tmp/test_run_with_pause_status.csv")
 
-
     @skip
-    #需要手动将配置文件改为Suspend 即strategy_status_cd=S
+    # 需要手动将配置文件改为Suspend 即strategy_status_cd=S
     def test_run_with_suspend_status(self, bsery: BigSmallEtfRotateStrategy):
         assert configs["strategy_status_cd"].data == "S"
         start_date = date(2022, 1, 24)
@@ -209,8 +208,7 @@ class TestBigSmallEtfRotateStrategy:
 
         assert actual.shape[0] == 0
 
-
     @skip
-    def test_stragegy_with_plot(self, db:DBAdaptor):
+    def test_stragegy_with_plot(self, db: DBAdaptor):
         bsery = BigSmallEtfRotateStrategy(1)
         bsery.run_with_plot(date.today())
