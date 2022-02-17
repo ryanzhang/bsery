@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 import argparse
-from datetime import date, datetime  # pragma: no cover
+from datetime import date # pragma: no cover
 
 from kupy.logger import logger
 
@@ -53,7 +53,7 @@ def main() -> None:  # pragma: no cover
 
     logger.info("Executing main function")
     bsery = BigSmallEtfRotateStrategy(1)
-    # today=datetime.today()
+    # today=date.today()
     today = date(2022, 1, 28)
     df = bsery.get_strategy_by_date(today)
     row_count = bsery.write_df_to_db(df)

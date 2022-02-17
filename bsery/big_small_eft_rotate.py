@@ -1,7 +1,7 @@
 # -*- coding: UTF-8 -*-
 
 import os.path
-from datetime import datetime
+from datetime import date, datetime
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -80,13 +80,13 @@ class BigSmallEtfRotateStrategy:
             raise Exception(f"strategy_status_cd值不合法 code: {status}!")
         self.strategy_status_cd = status
 
-    def deploy(self, start_date: datetime):
+    def deploy(self, start_date: date):
         """根据给定的日期进行部署策略，部署策略之后，结果会写入数据库
         同一个账户，同一天的数据不能覆盖，不能重复,否则会抛出异常
         结果会把给定日期到当前日期的策略结果写入数据库。
 
         Args:
-            start_date (datetime): 部署的起始日期
+            start_date (date): 部署的起始日期
         """
         if not self.util.is_trade_day(start_date=start_date):
             logger.info(f"{start_date} 不是交易日，跳过计算")
@@ -96,12 +96,12 @@ class BigSmallEtfRotateStrategy:
         pass
 
     def get_strategy_by_date(
-        self, start_date: datetime, end_date: datetime = None
+        self, start_date: date, end_date: date = None
     ) -> pd.DataFrame:
         """根据给定日期获取start_date之后的策略数据 包含start_date
 
         Args:
-            start_date (datetime): 启动日期为可交易etf基金的有效日期, 如果给定日期不可交易则抛出异常
+            start_date (date): 启动日期为可交易etf基金的有效日期, 如果给定日期不可交易则抛出异常
 
         Returns:
             Dataframe:
@@ -522,12 +522,12 @@ class BigSmallEtfRotateStrategy:
             raise Exception(f"{self.account.account_id} 资金状态不对: {cur}")
 
     def load_fundd_data(
-        self, begin_date: datetime, end_date: datetime = None
+        self, begin_date: date, end_date: date = None
     ) -> pd.DataFrame:
         """给定日期加载基金数据数据
 
         Args:
-            begin_date (datetime): 其实日期，包含起始日期
+            begin_date (date): 其实日期，包含起始日期
 
         Raises:
             Exception: 如果没有数据，抛出异常
@@ -554,12 +554,12 @@ class BigSmallEtfRotateStrategy:
         return df
 
     def backtest_by_date(
-        self, start_date: datetime, show_plot: bool
+        self, start_date: date, show_plot: bool
     ) -> pd.DataFrame:
         """根据给定的日期进行回测
 
         Args:
-            start_date (datetime): 部署的起始日期
+            start_date (date): 部署的起始日期
             show_plot (bool): 是否展示图表
 
         Returns:
@@ -567,7 +567,7 @@ class BigSmallEtfRotateStrategy:
         """
 
         # cur = start_date
-        # while cur <= datetime.today().date():
+        # while cur <= date.today().date():
         #     if not self.util.is_trade_day(cur):
         #         continue
         #     df = self.get_strategy_by_date(cur)
@@ -579,7 +579,7 @@ class BigSmallEtfRotateStrategy:
     ) -> pd.DataFrame:
         pass
 
-    def run_with_plot(self, start_date: datetime):
+    def run_with_plot(self, start_date: date):
         _backtest_sec = [
             "'20200716'",
             "'20210125'",

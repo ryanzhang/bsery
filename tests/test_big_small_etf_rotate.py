@@ -1,4 +1,4 @@
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from importlib import invalidate_caches
 import math
 import pytest
@@ -175,20 +175,20 @@ class TestBigSmallEtfRotateStrategy:
     # def test_stragegy_can_run_as_daemon_but_suspend(self, db:DBAdaptor):
     #     #假设30天前开始轮动
     #     bsery1 = BigSmallEtfRotateStrategy(1)
-    #     start_date=datetime.today().date() -timedelta(30)
+    #     start_date=date.today() -timedelta(30)
     #     bsery1.run_as_daemon(start_date)
     #     #运行20天，然后suspend， 10天
     #     bsery2 = BigSmallEtfRotateStrategy(1)
     #     bsery2.set_suspend_status(True)
-    #     start_date=datetime.today().date() -timedelta(10)
+    #     start_date=date.today() -timedelta(10)
     #     bsery2.run_as_daemon(start_date)
     #     #suspend 5天之后，再恢复
     #     bsery3 = BigSmallEtfRotateStrategy(1)
     #     bsery3.set_suspend_status(False)
-    #     start_date=datetime.today().date() -timedelta(5)
+    #     start_date=date.today() -timedelta(5)
     #     bsery3.run_as_daemon(start_date)
 
     # # @skip
     # def test_stragegy_can_run(self, db:DBAdaptor):
     #     bsery = BigSmallEtfRotateStrategy(1)
-    #     bsery.run_with_plot(datetime.today().date())
+    #     bsery.run_with_plot(date.today())
