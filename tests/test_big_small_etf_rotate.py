@@ -4,6 +4,7 @@ import math
 import pytest
 from kupy.dbadaptor import DBAdaptor
 from kupy.logger import logger
+from kupy.config import configs
 from bsery.big_small_eft_rotate import BigSmallEtfRotateStrategy
 import pandas as pd
 
@@ -172,23 +173,44 @@ class TestBigSmallEtfRotateStrategy:
 
         assert actual.shape[0] == 5
 
-    # def test_stragegy_can_run_as_daemon_but_suspend(self, db:DBAdaptor):
-    #     #假设30天前开始轮动
-    #     bsery1 = BigSmallEtfRotateStrategy(1)
-    #     start_date=date.today() -timedelta(30)
-    #     bsery1.run_as_daemon(start_date)
-    #     #运行20天，然后suspend， 10天
-    #     bsery2 = BigSmallEtfRotateStrategy(1)
-    #     bsery2.set_suspend_status(True)
-    #     start_date=date.today() -timedelta(10)
-    #     bsery2.run_as_daemon(start_date)
-    #     #suspend 5天之后，再恢复
-    #     bsery3 = BigSmallEtfRotateStrategy(1)
-    #     bsery3.set_suspend_status(False)
-    #     start_date=date.today() -timedelta(5)
-    #     bsery3.run_as_daemon(start_date)
+    @skip
+    def test_run_with_pause_status(self, bsery: BigSmallEtfRotateStrategy):
+        assert configs["strategy_status_cd"].data == "P"
+        start_date = date(2022, 1, 24)
+        end_date = date(2022, 1, 28)
+        expect1 = bsery.get_strategy_by_date(start_date, end_date)
+        bsery.write_df_to_db(expect1)
+        db = DBAdaptor()
+        actual = db.get_df_by_sql(
+            "select * from invest.big_small_etf_rotate order by id"
+        )
+        assert expect1 is not None
+        assert actual is not None
+        assert expect1.shape[0] == 5
+        assert actual.shape[0] == 5
+        actual.to_csv("/tmp/test_run_with_pause_status.csv")
 
-    # # @skip
-    # def test_stragegy_can_run(self, db:DBAdaptor):
-    #     bsery = BigSmallEtfRotateStrategy(1)
-    #     bsery.run_with_plot(date.today())
+
+    @skip
+    #需要手动将配置文件改为Suspend 即strategy_status_cd=S
+    def test_run_with_suspend_status(self, bsery: BigSmallEtfRotateStrategy):
+        assert configs["strategy_status_cd"].data == "S"
+        start_date = date(2022, 1, 24)
+        end_date = date(2022, 1, 28)
+        expect1 = bsery.get_strategy_by_date(start_date, end_date)
+        bsery.write_df_to_db(expect1)
+        db = DBAdaptor()
+        actual = db.get_df_by_sql(
+            "select * from invest.big_small_etf_rotate order by id"
+        )
+        assert expect1 is not None
+        assert actual is not None
+        assert expect1.shape[0] == 5
+
+        assert actual.shape[0] == 0
+
+
+    @skip
+    def test_stragegy_with_plot(self, db:DBAdaptor):
+        bsery = BigSmallEtfRotateStrategy(1)
+        bsery.run_with_plot(date.today())
