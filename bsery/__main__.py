@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 import argparse
-from datetime import date # pragma: no cover
+from datetime import date  # pragma: no cover
 
 from kupy.logger import logger
 

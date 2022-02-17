@@ -580,12 +580,6 @@ class BigSmallEtfRotateStrategy:
         pass
 
     def run_with_plot(self, start_date: date):
-        _backtest_sec = [
-            "'20200716'",
-            "'20210125'",
-            "'20210315'",
-            "'20210722'",
-        ]
         # 策略参数
         # 回测起始日期
         # _backtest_sec=["'20050101'" ,"'20090101'" , "'20140101'", "'20160101'","'20190101'"]
@@ -593,6 +587,13 @@ class BigSmallEtfRotateStrategy:
         # _start_date="'20201223'"
 
         # start_time = time.time()
+
+        _backtest_sec = [
+            date(2020, 7, 16),
+            date(2021, 1, 25),
+            date(2021, 3, 15),
+            date(2021, 7, 22),
+        ]
 
         for _start_date in _backtest_sec:
             # 因为计算N日动量，前N日是没有数据的，因此要提前N+8日
@@ -602,7 +603,9 @@ class BigSmallEtfRotateStrategy:
             # 开启新窗口
             plt.figure()
             plt.plot(
-                df["strategy_net"], label=_start_date + "strategy", linewidth=4
+                df["strategy_net"],
+                label=str(_start_date) + "strategy",
+                linewidth=4,
             )
             # 下面两条作为bench mark
             plt.plot(df["big_net"], label="big")
