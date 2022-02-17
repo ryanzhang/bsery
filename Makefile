@@ -131,7 +131,7 @@ image:
 	podman push default-route-openshift-image-registry.apps.ocp1.galaxy.io/classic-dev/bsery:latest --tls-verify=false
 
 systest1: virtualenv
-	@soruce .venv/bin/activate
+	@source .venv/bin/activate
 	@python3 -m bsery
 
 systest2:
@@ -167,18 +167,12 @@ tag-dev:
 	oc set image cronjob/bsery bsery=image-registry.openshift-image-registry.svc:5000/classic-dev/bsery:$${TAG} -n classic-dev;\
 	echo "Release $${TAG} has been deployed successfullyto stage environment!"
 
-deploystage: test image systest tag-dev release
+deploystage: test image systest2 tag-dev
 
-deployprod:
+deployprod: release
 	@oc apply -f .openshift/prod/cm.yaml
 	@TAG=$(shell cat bsery/VERSION);\
 	oc tag classic-dev/bsery:$${TAG} quant-invest/bsery:$${TAG};\
 	oc set image cronjob/bsery bsery=image-registry.openshift-image-registry.svc:5000/quant-invest/bsery:$${TAG} -n quant-invest;\
 	echo "Release $${TAG} has been deployed successfullyto production🚀!"
 	
-
-# This project has been generated from ryanzhang/python-project-template which is forked from 
-# rochacbruno/python-project-template
-# __author__ = 'rochacbruno'
-# __repo__ = https://github.com/rochacbruno/python-project-template
-# __sponsor__ = https://github.com/sponsors/rochacbruno/
