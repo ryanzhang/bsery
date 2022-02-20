@@ -212,3 +212,25 @@ class TestBigSmallEtfRotateStrategy:
     def test_stragegy_with_plot(self, db: DBAdaptor):
         bsery = BigSmallEtfRotateStrategy(1)
         bsery.run_with_plot(date.today())
+
+    @skip
+    def test_deploy_from_2021_1_14(self, bsery: BigSmallEtfRotateStrategy):
+        start_date = date(2021, 1, 14)
+        # end_date = date(2022, 1, 28)
+        expect = bsery.get_strategy_by_date(start_date)
+        bsery.write_df_to_db(expect)
+        db = DBAdaptor()
+        actual = db.get_df_by_sql(
+            "select * from invest.big_small_etf_rotate order by id"
+        )
+
+        assert expect is not None
+        assert actual is not None
+        actual.to_csv("/tmp/new_deploy_bsery_from_20210114.csv")
+
+        assert actual.shape[0] > 1
+
+        # assert actual["trade_date"].iloc[0] == start_date
+        # assert actual["pos"].iloc[0] == "empty"
+        # assert actual["pos"].iloc[1] == "small"
+        # actual.to_csv("/tmp/db_export.csv")
