@@ -36,6 +36,7 @@ class TestBigSmallEtfRotateStrategy:
         db.execute_any_sql("delete from invest.big_small_etf_rotate")
         yield
         logger.info("TestCase Level Tear Down is triggered!")
+        
 
     def test_strategy_construct_ok(self, db: DBAdaptor):
         bsery = BigSmallEtfRotateStrategy(1)
@@ -208,7 +209,7 @@ class TestBigSmallEtfRotateStrategy:
 
         assert actual.shape[0] == 0
 
-    @skip
+    # @skip
     def test_stragegy_with_plot(self, db: DBAdaptor):
         bsery = BigSmallEtfRotateStrategy(1)
         bsery.run_with_plot(date.today())

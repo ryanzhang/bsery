@@ -59,6 +59,7 @@ class BigSmallEtfRotateStrategy:
         self.ticker_y_name = df_ticker.loc[
             df_ticker["ticker"] == self.ticker_y, "sec_short_name"
         ].iloc[0]
+        self.mmf_rate = float(configs["mmf_rate"].data)/(100*365)
 
     @staticmethod
     def is_valid_status_cd(status: str) -> bool:
@@ -258,6 +259,12 @@ class BigSmallEtfRotateStrategy:
             + (df["close_price_y"] / df["open_price_y"])
             - (1 + self.trade_rate)
         )
+
+        #空仓为货基收益
+        df.loc[
+            (df["trade_cd"] == 0) & (df["pos"] == "empty"),
+            "strategy_chg_pct_adj"
+        ] = self.mmf_rate
         # df.set_index('trade_date')
 
         df["big_net"] = (1 + df["chg_pct_x"]).cumprod()
@@ -433,11 +440,14 @@ class BigSmallEtfRotateStrategy:
         cur = AccountData()
         if row["trade_cd"] == 0:
             cur.trade_fee = 0
-            change = pre.amount * row["strategy_chg_pct"]
-            cur.amount = pre.amount + change
-            cur.total_amount = pre.total_amount + change
-            cur.balance = pre.balance
             cur.vol = pre.vol
+            if row["pos"] == "empty":
+                change = pre.total_amount * row["strategy_chg_pct_adj"] 
+            else:
+                change = pre.amount * row["strategy_chg_pct"] 
+                cur.amount = pre.amount + change
+            cur.total_amount = pre.total_amount + change
+            cur.balance = cur.total_amount-cur.amount
             # vol,balance 和pre一样
             cur.chg_pct = change / pre.total_amount
             cur.net = pre.net * (1 + cur.chg_pct)
